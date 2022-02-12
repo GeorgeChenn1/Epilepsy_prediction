@@ -1,6 +1,6 @@
 import torch.nn as nn
 import torch.nn.functional as F
-
+import torch
 
 class EEGNet(nn.Module):
     def __init__(self, in_chan=0, fc_num=0, out_chann=0):
@@ -23,15 +23,29 @@ class EEGNet(nn.Module):
         self.pooling3 = nn.MaxPool2d((2, 4))
 
         # FC Layer
-        self.fc1 = nn.Linear(fc_num, out_chann)
+        #self.fc1 = nn.Linear(fc_num, out_chann)
 
     def forward(self, x):
         # Layer 1
+        #print(type(x))
+        x = x.float()
+        #print(x.dtype)
+        #print(type(x))
+        #print(x.dtype)
+        #print('&1&')
+        #print(x.shape)
+        #input('')
+        # (Number_of_samples, Channel(1 in EEG, 3 in image), Height(Channel), Width(Time sample))
         x = F.elu(self.conv1(x))
         x = self.batchnorm1(x)
+        #print('&2&')
+        #print(x.shape)
+        #input('')
         x = F.dropout(x, 0.25)
         x = x.permute(0, 3, 1, 2)
-
+        #print('&3&')
+        #print(x.shape)
+        #input('')
         # Layer 2
         x = self.padding1(x)
         x = F.elu(self.conv2(x))
@@ -47,6 +61,6 @@ class EEGNet(nn.Module):
         x = self.pooling3(x)
 
         # FC Layer
-        x = x.reshape(x.size()[0], -1)
-        x = self.fc1(x)
+        x = x.reshape(x.size()[0], -1) # TODO: delete line
+        #x = self.fc1(x)
         return x
